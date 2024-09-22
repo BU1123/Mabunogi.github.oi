@@ -8,20 +8,18 @@
         <style>
             @font-face {
                 font-family: 'RawMarukoGothic';
-                /* 自定義字體名稱 */
-                src: url('/fonts/RawMarukoGothicCjkTc-With-Korea-Regular.ttf') format('truetype');
-                /* 字體檔案路徑 */
+                src: url('/fonts/RawMarukoGothicCjkTc-With-Korea-Regular.woff2') format('woff2'),
+                    url('/fonts/RawMarukoGothicCjkTc-With-Korea-Regular.woff') format('woff'),
+                    url('/fonts/RawMarukoGothicCjkTc-With-Korea-Regular.ttf') format('truetype');
             }
 
             body {
                 font-family: 'RawMarukoGothic', sans-serif;
-                /* 使用自定義字體 */
                 margin: 20px;
             }
 
             table {
-                width: 50%;
-                /* 將表格寬度縮短一半 */
+                width: 40%;
                 border-collapse: collapse;
                 margin-bottom: 20px;
             }
@@ -44,23 +42,46 @@
                 font-size: 1.2em;
             }
 
-            /* 將勾選方塊放大 5 倍 */
+            /* 縮短倍率欄的寬度 */
+            .multiplier-column {
+                width: 20%;
+            }
+
+            /* 將勾選方塊放大 4 倍 */
             input[type="checkbox"] {
-                transform: scale(5);
+                transform: scale(4);
                 margin: 10px;
             }
 
-            /* 將「計算總倍率」按鈕放大 5 倍 */
-            button {
-                font-size: 2em;
-                padding: 20px 40px;
-                transform: scale(1.5);
+            /* 調整活動(自填)輸入框的寬度 */
+            .small-input {
+                width: 50px;
             }
 
             /* 將總倍率顯示放大 5 倍 */
             #totalMultiplier {
                 font-size: 3em;
                 color: red;
+            }
+
+            /* 新增取消勾選按鈕的樣式 */
+            .reset-button {
+                margin-top: 20px;
+                font-size: 1.2em;
+                padding: 10px 20px;
+                background-color: #f44336;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+            .reset-button:hover {
+                background-color: #d32f2f;
+            }
+
+            /* 將表格最後一行的邊框設為透明 */
+            tfoot tr td {
+                border-color: transparent;
             }
 
         </style>
@@ -72,18 +93,25 @@
             <thead>
                 <tr>
                     <th>項目</th>
-                    <th>倍率</th>
+                    <th class="multiplier-column">倍率</th>
                     <th>勾選</th>
                 </tr>
             </thead>
             <tbody id="itemTable">
                 <!-- 表格項目會由 JavaScript 動態生成 -->
             </tbody>
+            <!-- 新增一行來顯示總倍率和取消勾選 -->
+            <tfoot>
+                <tr>
+                    <td colspan="3">
+                        <div class="center">
+                            <p>總倍率：<span id="totalMultiplier">1</span></p>
+                            <button class="reset-button" onclick="resetSelections()">取消勾選</button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
-        <div class="center">
-            <button onclick="calculate()">計算總倍率</button>
-            <p id="result">總倍率：<span id="totalMultiplier">1</span></p>
-        </div>
 
         <script>
             const items = [
@@ -122,23 +150,28 @@
                             select.appendChild(optionElement);
                         });
                         multiplierCell.appendChild(select);
+                        select.addEventListener('change', calculate); // 當選項改變時自動計算
                         select.dataset.type = 'select';
                     } else if (item.type === 'input') {
                         const input = document.createElement('input');
                         input.type = 'number';
                         input.min = 1;
-                        input.placeholder = '填寫倍率';
+                        input.placeholder = '';
+                        input.classList.add('small-input'); // 設置小輸入框類名
                         multiplierCell.appendChild(input);
+                        input.addEventListener('input', calculate); // 當輸入變更時自動計算
                         input.dataset.type = 'input';
                     } else {
                         multiplierCell.textContent = item.multiplier || '-';
                     }
+                    multiplierCell.classList.add('multiplier-column'); // 給倍率欄位添加類名
                     row.appendChild(multiplierCell);
 
                     const controlCell = document.createElement('td');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.dataset.multiplier = item.multiplier || 1;
+                    checkbox.addEventListener('change', calculate); // 當勾選框改變時自動計算
                     controlCell.appendChild(checkbox);
                     row.appendChild(controlCell);
 
@@ -165,6 +198,15 @@
                 });
 
                 document.getElementById('totalMultiplier').textContent = totalMultiplier.toFixed(2);
+            }
+
+            function resetSelections() {
+                // 找到所有核取方塊並取消勾選
+                const checkboxes = document.querySelectorAll('#itemTable input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                calculate(); // 取消勾選後重新計算總倍率
             }
 
             window.onload = createTable;

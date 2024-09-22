@@ -1,112 +1,174 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>倍率計算器</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        .highlight {
-            background-color: #fdd;
-        }
-        .center {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <h1>倍率計算器</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>項目</th>
-                <th>倍率</th>
-                <th>勾選</th>
-            </tr>
-        </thead>
-        <tbody id="itemTable">
-            <!-- 表格項目會由 JavaScript 動態生成 -->
-        </tbody>
-    </table>
-    <div class="center">
-        <button onclick="calculate()">計算總倍率</button>
-        <p id="result">總倍率：<span id="totalMultiplier">1</span></p>
-    </div>
 
-    <script>
-        const items = [
-            { name: '經驗水 (2, 4, 5倍)', multiplier: 4, highlighted: true },
-            { name: '祝福水', multiplier: 1.5 },
-            { name: '布糖姬', multiplier: 1.5 },
-            { name: '女神的回歸 (壞掉場)', multiplier: 1.45 },
-            { name: '聖靈蓮結 (15等 = 45%)', multiplier: 1.45, highlighted: true },
-            { name: '雙魚座的禮贈', multiplier: 2 },
-            { name: '粉芋光環', multiplier: 2 },
-            { name: '娃娃2 (9% = 1.09, 10% = 1.1)', multiplier: 1.1 },
-            { name: '騎士團水晶 (借鑑士任務專用)', multiplier: 1.3 },
-            { name: '大使 (大海女/慶典槍)', multiplier: 2 },
-            { name: 'VVIP', multiplier: 1.4 },
-            { name: '活動', multiplier: 3 },
-            { name: '霜靈符咒', multiplier: 2 },
-            { name: '娜歐精靈', multiplier: 2 }
-        ];
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>瑪奇經驗加成計算機</title>
+        <style>
+            @font-face {
+                font-family: 'RawMarukoGothic';
+                /* 自定義字體名稱 */
+                src: url('/fonts/RawMarukoGothicCjkTc-With-Korea-Regular.ttf') format('truetype');
+                /* 字體檔案路徑 */
+            }
 
-        function createTable() {
-            const tableBody = document.getElementById('itemTable');
-            items.forEach(item => {
-                const row = document.createElement('tr');
-                if (item.highlighted) {
-                    row.classList.add('highlight');
-                }
+            body {
+                font-family: 'RawMarukoGothic', sans-serif;
+                /* 使用自定義字體 */
+                margin: 20px;
+            }
 
-                const nameCell = document.createElement('td');
-                nameCell.textContent = item.name;
-                row.appendChild(nameCell);
+            table {
+                width: 50%;
+                /* 將表格寬度縮短一半 */
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
 
-                const multiplierCell = document.createElement('td');
-                multiplierCell.textContent = item.multiplier;
-                row.appendChild(multiplierCell);
+            table,
+            th,
+            td {
+                border: 1px solid black;
+            }
 
-                const checkboxCell = document.createElement('td');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.dataset.multiplier = item.multiplier;
-                row.appendChild(checkboxCell);
-                checkboxCell.appendChild(checkbox);
+            th,
+            td {
+                padding: 10px;
+                text-align: center;
+            }
 
-                tableBody.appendChild(row);
-            });
-        }
+            /* 將表頭背景設為 #81C7D4 */
+            th {
+                background-color: #81C7D4;
+                font-size: 1.2em;
+            }
 
-        function calculate() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            let totalMultiplier = 1;
+            /* 將勾選方塊放大 5 倍 */
+            input[type="checkbox"] {
+                transform: scale(5);
+                margin: 10px;
+            }
 
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    totalMultiplier *= parseFloat(checkbox.dataset.multiplier);
-                }
-            });
+            /* 將「計算總倍率」按鈕放大 5 倍 */
+            button {
+                font-size: 2em;
+                padding: 20px 40px;
+                transform: scale(1.5);
+            }
 
-            document.getElementById('totalMultiplier').textContent = totalMultiplier.toFixed(2);
-        }
+            /* 將總倍率顯示放大 5 倍 */
+            #totalMultiplier {
+                font-size: 3em;
+                color: red;
+            }
 
-        window.onload = createTable;
-    </script>
-</body>
+        </style>
+    </head>
+
+    <body>
+        <h1>瑪奇經驗加成計算機</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>倍率</th>
+                    <th>勾選</th>
+                </tr>
+            </thead>
+            <tbody id="itemTable">
+                <!-- 表格項目會由 JavaScript 動態生成 -->
+            </tbody>
+        </table>
+        <div class="center">
+            <button onclick="calculate()">計算總倍率</button>
+            <p id="result">總倍率：<span id="totalMultiplier">1</span></p>
+        </div>
+
+        <script>
+            const items = [
+                { name: '經驗水 (2, 4, 5倍)', type: 'select', options: [{ text: '2倍', value: 2 }, { text: '4倍(拉狄卡、強化)', value: 4 }, { text: '5倍(皇家)', value: 5 }] },
+                { name: '祝福宗', multiplier: 1.5 },
+                { name: '主稱號（布蘿妮或其他）', multiplier: 1.5 },
+                { name: '副稱號（烈焰騎士團教官或其他）', multiplier: 1.1 },
+                { name: '女神的回歸 (須購買物品並至農場使用)', multiplier: 1.1 },
+                { name: '聖靈連結 (1~15 等級)', type: 'select', options: Array.from({ length: 15 }, (_, i) => ({ text: `${i + 1}等`, value: (i + 1) * 3 / 100 + 1 })) },
+                { name: '雙魚座氣球or事半功倍的補藥', multiplier: 2 },
+                { name: '粉黃光稜鏡', multiplier: 2 },
+                { name: '娃娃包 (9%, 10%, 12%)', type: 'select', options: [{ text: '9%', value: 1.09 }, { text: '10%', value: 1.1 }, { text: '12%', value: 1.12 }] },
+                { name: '騎士團水晶(僅騎士任務有用)', type: 'select', options: [{ text: '1.5倍', value: 1.5 }, { text: '2倍', value: 2 }, { text: '3倍', value: 3 }] },
+                { name: '衣服(大海衣/慶典袍)', multiplier: 1.1 },
+                { name: 'VVIP', multiplier: 1.4 },
+                { name: '活動(自填)', type: 'input', multiplier: 1 },
+                { name: '露娜符咒', multiplier: 2 }
+            ];
+
+            function createTable() {
+                const tableBody = document.getElementById('itemTable');
+                items.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = item.name;
+                    row.appendChild(nameCell);
+
+                    const multiplierCell = document.createElement('td');
+                    if (item.type === 'select') {
+                        const select = document.createElement('select');
+                        item.options.forEach(option => {
+                            const optionElement = document.createElement('option');
+                            optionElement.textContent = option.text;
+                            optionElement.value = option.value;
+                            select.appendChild(optionElement);
+                        });
+                        multiplierCell.appendChild(select);
+                        select.dataset.type = 'select';
+                    } else if (item.type === 'input') {
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.min = 1;
+                        input.placeholder = '填寫倍率';
+                        multiplierCell.appendChild(input);
+                        input.dataset.type = 'input';
+                    } else {
+                        multiplierCell.textContent = item.multiplier || '-';
+                    }
+                    row.appendChild(multiplierCell);
+
+                    const controlCell = document.createElement('td');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.dataset.multiplier = item.multiplier || 1;
+                    controlCell.appendChild(checkbox);
+                    row.appendChild(controlCell);
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function calculate() {
+                let totalMultiplier = 1;
+                const rows = document.querySelectorAll('#itemTable tr');
+                rows.forEach(row => {
+                    const control = row.querySelector('input[type="checkbox"]');
+                    const select = row.querySelector('select');
+                    const input = row.querySelector('input[type="number"]');
+                    if (control.checked) {
+                        if (select) {
+                            totalMultiplier *= parseFloat(select.value) || 1; // 使用者選擇的倍率
+                        } else if (input) {
+                            totalMultiplier *= parseFloat(input.value) || 1; // 使用者填入的倍率
+                        } else {
+                            totalMultiplier *= parseFloat(control.dataset.multiplier); // 固定倍率
+                        }
+                    }
+                });
+
+                document.getElementById('totalMultiplier').textContent = totalMultiplier.toFixed(2);
+            }
+
+            window.onload = createTable;
+        </script>
+    </body>
+
 </html>
